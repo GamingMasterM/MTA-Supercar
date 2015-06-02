@@ -25,7 +25,9 @@ local SuperCars = {}
 
 function createSupercar()
 	local veh = createVehicle(SuperCarID, unpack(SuperCarSpawnPos))
-	table.insert(SuperCars, veh)
+	SuperCars[veh] = {}
+	SuperCars[veh].Hirschkopf = createObject(1736, 0, 0, 0)
+	attachElements(SuperCars[veh].Hirschkopf, veh, 0, 2.9, 0, 10, 0, 180)
 	local r, g, b = unpack(SuperCarColor)
 	setVehicleColor(veh, r, g, b, r, g, b)
 	
@@ -43,19 +45,31 @@ end
 --\\
 
 function getSupercars(player)
-	outputConsole("Liste der Supercars:")
+	outputConsole("Liste der Supercars:", player)
 	for i,v in ipairs(SuperCars) do 
-		local id = getElementModel(v)
-		local model = getVehicleName(v)
-		local driver = getVehicleController(v) and getPlayerName(getVehicleController(v)) or "keiner"
-		local posX, posY, posZ = getElementPosition(v)
-		local zone, city = getElementZoneName(v), getElementZoneName(v, true)
-		outputConsole(("Modell: %s (ID: %s), Fahrer: %s, Standort: %s in %s"):format(model, id, driver, zone, city))
+		local id = getElementModel(i)
+		local model = getVehicleName(i)
+		local driver = getVehicleController(i) and getPlayerName(getVehicleController(i)) or "keiner"
+		local posX, posY, posZ = getElementPosition(i)
+		local zone, city = getElementZoneName(i), getElementZoneName(i, true)
+		outputConsole(("Modell: %s (ID: %s), Fahrer: %s, Standort: %s in %s"):format(model, id, driver, zone, city), player)
 	end
-	outputConsole(" - Ende der Liste - ")
+	outputConsole(" - Ende der Liste - ", player)
 
 end
 addCommandHandler("supercars", getSupercars)
+
+
+--//
+--||	triggerSupercarData
+--\\
+
+function triggerSupercarData()
+	triggerClientEvent(client, "Supercar_onDataGet", resourceRoot, SuperCars)
+end
+addEvent("Supercar_onClientDataRequest",true)
+addEventHandler("Supercar_onClientDataRequest",resourceRoot,triggerSupercarData)
+
 
 
 
