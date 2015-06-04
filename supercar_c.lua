@@ -31,13 +31,48 @@ function getSupercars(supercars)
 		setWeaponProperty(SuperCars[i].MinigunLinks, "fire_rotation",Vector3(mv.fx, mv.fy, mv.fz))
 		setElementParent(SuperCars[i].MinigunRechts, i)
 		setElementParent(SuperCars[i].MinigunLinks, i)
-		setWeaponState(SuperCars[i].MinigunRechts,"firing")
-		setWeaponState(SuperCars[i].MinigunLinks,"firing")
+		setMinigunState(i, SuperCars[i].MinigunState)
 	end
 end
 
 addEvent("Supercar_onDataGet",true)
 addEventHandler("Supercar_onDataGet",resourceRoot,getSupercars)
+
+
+--//
+--||	setMinigunState
+--\\
+
+function setMinigunState(veh, state)
+	if state then
+		setWeaponState(SuperCars[veh].MinigunRechts,"firing")
+		setWeaponState(SuperCars[veh].MinigunLinks,"firing")
+	else
+		setWeaponState(SuperCars[veh].MinigunRechts,"ready")
+		setWeaponState(SuperCars[veh].MinigunLinks,"ready")
+	end
+	SuperCars[veh].MinigunState = state
+end
+
+addEvent("Supercar_onMinigunStateChange",true)
+addEventHandler("Supercar_onMinigunStateChange",resourceRoot,setMinigunState)
+
+
+--//
+--||	fireRocket
+--\\
+
+function fireRocket(veh)
+	    local x,y,z = getElementPosition(veh)
+        local _,_,rZ = getElementRotation(veh)
+        local x = x+2*math.cos(math.rad(rZ+90))
+        local y = y+2*math.sin(math.rad(rZ+90))
+        createProjectile(veh, 19, x, y, z+1.1, 1.0, nil)
+end
+
+addEvent("Supercar_onRocketFire",true)
+addEventHandler("Supercar_onRocketFire",resourceRoot,fireRocket)
+
 
 addEventHandler("onClientResourceStart",resourceRoot, function()   
 	triggerServerEvent("Supercar_onClientDataRequest", resourceRoot)
